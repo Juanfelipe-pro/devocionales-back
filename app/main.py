@@ -106,7 +106,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -138,21 +138,6 @@ async def api_key_middleware(request: Request, call_next):
 # DEPENDENCIAS DE SEGURIDAD
 # =============================================================================
 
-async def verify_api_key(x_api_key: str = Header(..., description="API Key de autenticación")):
-    """
-    Verifica que la API Key proporcionada sea válida.
-    
-    Se requiere en TODOS los endpoints.
-    Enviar en header: X-API-Key: tu-clave
-    """
-    if x_api_key != API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API Key inválida o no proporcionada",
-            headers={"WWW-Authenticate": "ApiKey"}
-        )
-    return x_api_key
-
 
 # =============================================================================
 # MANEJADORES DE EXCEPCIONES
@@ -175,9 +160,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 # ENDPOINTS
 # =============================================================================
 
-@app.options("/{path:path}")
-async def options_handler(path: str):
-    return Response(status_code=200)
+
 
 @app.get(
     "/health",
