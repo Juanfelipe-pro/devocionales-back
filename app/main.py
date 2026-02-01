@@ -114,19 +114,20 @@ app.add_middleware(
 # DEPENDENCIAS DE SEGURIDAD
 # =============================================================================
 
-async def verify_api_key(x_api_key: str = Header(..., description="API Key de autenticación")):
-    """
-    Verifica que la API Key proporcionada sea válida.
-    
-    Se requiere en TODOS los endpoints.
-    Enviar en header: X-API-Key: tu-clave
-    """
+async def verify_api_key(
+    request: Request,
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
+):
+    # ⛔ Permitir preflight CORS
+    if request.method == "OPTIONS":
+        return None
+
     if x_api_key != API_KEY:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API Key inválida o no proporcionada",
-            headers={"WWW-Authenticate": "ApiKey"}
+            detail="API Key inválida o no proporcionada"
         )
+
     return x_api_key
 
 
