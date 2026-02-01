@@ -50,7 +50,7 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 # Dominios permitidos para CORS (configurar según tu dominio)
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:5500,https://devocionales-taupe.vercel.app").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 
 # =============================================================================
@@ -223,8 +223,7 @@ async def crear_registro(
     registro: WaitlistCreate,
     request: Request,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
-):
+    
     """Crea un nuevo registro en la lista de espera."""
     
     # Obtener IP del cliente (para auditoría)
@@ -303,8 +302,7 @@ async def listar_registros(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
-):
+    
     """Lista todos los registros con paginación."""
     
     registros = db.query(WaitlistEntry).order_by(
@@ -323,8 +321,7 @@ async def listar_registros(
 )
 async def contar_registros(
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
-):
+    
     """Cuenta el total de registros."""
     
     total = db.query(WaitlistEntry).count()
@@ -345,8 +342,7 @@ async def contar_registros(
 async def verificar_email(
     email: str,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
-):
+    
     """Verifica si un email existe en la lista."""
     
     email_lower = email.lower().strip()
@@ -376,8 +372,7 @@ async def verificar_email(
 async def obtener_registro(
     registro_id: int,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
-):
+    
     """Obtiene un registro por su ID."""
     
     registro = db.query(WaitlistEntry).filter(
@@ -402,8 +397,7 @@ async def obtener_registro(
 async def eliminar_registro(
     registro_id: int,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
-):
+    
     """Elimina un registro por su ID."""
     
     registro = db.query(WaitlistEntry).filter(
