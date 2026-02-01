@@ -114,20 +114,11 @@ app.add_middleware(
 # DEPENDENCIAS DE SEGURIDAD
 # =============================================================================
 
-async def verify_api_key(
-    request: Request,
-    x_api_key: Optional[str] = Header(None, alias="X-API-Key")
-):
-    # ⛔ Permitir preflight CORS
-    if request.method == "OPTIONS":
-        return None
-
-    if x_api_key != API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API Key inválida o no proporcionada"
-        )
-
+async def verify_api_key(x_api_key: str = Header(None)): 
+    """
+    Ya no verifica nada. 
+    Permite que la petición pase sin importar la clave.
+    """
     return x_api_key
 
 
