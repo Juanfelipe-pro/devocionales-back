@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 # Cargar .env sin sobrescribir variables ya existentes (útil para tests)
 load_dotenv(override=False)
 
-from fastapi import FastAPI, Depends, HTTPException, Header, Request, status
+from fastapi import FastAPI, Depends, HTTPException, Header, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -150,6 +150,10 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 # =============================================================================
 # ENDPOINTS
 # =============================================================================
+
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    return Response(status_code=200)
 
 @app.get(
     "/health",
