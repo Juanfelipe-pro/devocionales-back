@@ -1,0 +1,64 @@
+# ========================
+# Entornos virtuales
+# ========================
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# ========================
+# Variables de entorno
+# ========================
+.env
+.env.*
+*.env
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ========================
+# FastAPI / Uvicorn / Gunicorn
+# ========================
+*.log
+logs/
+uvicorn.log
+gunicorn.log
+
+# ========================
+# Bases de datos locales
+# ========================
+*.sqlite3
+*.db
+
+# ========================
+# Archivos temporales
+# ========================
+*.tmp
+*.bak
+*.swp
+
+# ========================
+# Pytest / Coverage
+# ========================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ========================
+# IDEs / Editores
+# ========================
+.vscode/
+.idea/
+*.iml
+
+# ========================
+# Sistema operativo
+# ========================
+.DS_Store
+Thumbs.db
