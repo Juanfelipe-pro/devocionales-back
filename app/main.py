@@ -110,29 +110,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def api_key_middleware(request: Request, call_next):
 
-    # 🔓 Permitir preflight CORS
-    if request.method == "OPTIONS":
-        return await call_next(request)
-
-    # 🔓 Permitir health
-    if request.url.path == "/health":
-        return await call_next(request)
-
-    # 🔐 Validar API Key
-    api_key = request.headers.get("X-API-Key")
-    if api_key != API_KEY:
-        return JSONResponse(
-            status_code=401,
-            content={
-                "success": False,
-                "error": "API Key inválida o no proporcionada"
-            }
-        )
-
-    return await call_next(request)
 
 # =============================================================================
 # DEPENDENCIAS DE SEGURIDAD
