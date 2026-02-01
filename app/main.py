@@ -110,6 +110,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+
+    # 🔓 Permitir preflight CORS
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
+    # 🔓 Permitir health
+    if request.url.path == "/health":
+        return await call_next(request)
+
+    # 🔐 Validar API Key
+    api_key = request.headers.get("X-API-Key")
+    if api_key != API_KEY:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "success": False,
+                "error": "API Key inválida o no proporcionada"
+            }
+        )
+
+    return await call_next(request)
+
 # =============================================================================
 # DEPENDENCIAS DE SEGURIDAD
 # =============================================================================
@@ -235,7 +259,7 @@ async def crear_registro(
     registro: WaitlistCreate,
     request: Request,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    
 ):
     """Crea un nuevo registro en la lista de espera."""
     
@@ -315,7 +339,7 @@ async def listar_registros(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    
 ):
     """Lista todos los registros con paginación."""
     
@@ -335,7 +359,7 @@ async def listar_registros(
 )
 async def contar_registros(
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    
 ):
     """Cuenta el total de registros."""
     
@@ -357,7 +381,7 @@ async def contar_registros(
 async def verificar_email(
     email: str,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    
 ):
     """Verifica si un email existe en la lista."""
     
@@ -388,7 +412,7 @@ async def verificar_email(
 async def obtener_registro(
     registro_id: int,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    
 ):
     """Obtiene un registro por su ID."""
     
@@ -414,7 +438,7 @@ async def obtener_registro(
 async def eliminar_registro(
     registro_id: int,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
+    
 ):
     """Elimina un registro por su ID."""
     
@@ -450,7 +474,7 @@ async def eliminar_registro(
     summary="Política de tratamiento de datos",
     description="Texto de la política de tratamiento de datos según Ley 1581 de 2012."
 )
-async def politica_datos(api_key: str = Depends(verify_api_key)):
+async def politica_datos():
     """Retorna el texto de la política de datos."""
     
     return {
