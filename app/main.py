@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 # Cargar .env sin sobrescribir variables ya existentes (útil para tests)
 load_dotenv(override=False)
 
-from fastapi import FastAPI, Depends, HTTPException, Header, Request, Response, status
+from fastapi import FastAPI, Depends, HTTPException, Header, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -50,7 +50,7 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 # Dominios permitidos para CORS (configurar según tu dominio)
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:5500,https://devocionales-taupe.vercel.app,https://www.sembradoresdefe.com,https://sembradoresdefe.com").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:5500,https://devocionales-taupe.vercel.app").split(",")
 
 
 # =============================================================================
@@ -106,15 +106,28 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
-
-
 
 # =============================================================================
 # DEPENDENCIAS DE SEGURIDAD
 # =============================================================================
+
+async def verify_api_key(x_api_key: str = Header(..., description="API Key de autenticación")):
+    """
+    Verifica que la API Key proporcionada sea válida.
+    
+    Se requiere en TODOS los endpoints.
+    Enviar en header: X-API-Key: tu-clave
+    """
+    if x_api_key != API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API Key inválida o no proporcionada",
+            headers={"WWW-Authenticate": "ApiKey"}
+        )
+    return x_api_key
 
 
 # =============================================================================
@@ -137,8 +150,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 # =============================================================================
 # ENDPOINTS
 # =============================================================================
-
-
 
 @app.get(
     "/health",
@@ -220,7 +231,7 @@ async def crear_registro(
     registro: WaitlistCreate,
     request: Request,
     db: Session = Depends(get_db),
-    
+    api_key: str = Depends(verify_api_key)
 ):
     """Crea un nuevo registro en la lista de espera."""
     
@@ -300,7 +311,7 @@ async def listar_registros(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
-    
+    api_key: str = Depends(verify_api_key)
 ):
     """Lista todos los registros con paginación."""
     
@@ -320,7 +331,7 @@ async def listar_registros(
 )
 async def contar_registros(
     db: Session = Depends(get_db),
-    
+    api_key: str = Depends(verify_api_key)
 ):
     """Cuenta el total de registros."""
     
@@ -342,7 +353,7 @@ async def contar_registros(
 async def verificar_email(
     email: str,
     db: Session = Depends(get_db),
-    
+    api_key: str = Depends(verify_api_key)
 ):
     """Verifica si un email existe en la lista."""
     
@@ -373,7 +384,7 @@ async def verificar_email(
 async def obtener_registro(
     registro_id: int,
     db: Session = Depends(get_db),
-    
+    api_key: str = Depends(verify_api_key)
 ):
     """Obtiene un registro por su ID."""
     
@@ -399,7 +410,7 @@ async def obtener_registro(
 async def eliminar_registro(
     registro_id: int,
     db: Session = Depends(get_db),
-    
+    api_key: str = Depends(verify_api_key)
 ):
     """Elimina un registro por su ID."""
     
@@ -435,7 +446,7 @@ async def eliminar_registro(
     summary="Política de tratamiento de datos",
     description="Texto de la política de tratamiento de datos según Ley 1581 de 2012."
 )
-async def politica_datos():
+async def politica_datos(api_key: str = Depends(verify_api_key)):
     """Retorna el texto de la política de datos."""
     
     return {
