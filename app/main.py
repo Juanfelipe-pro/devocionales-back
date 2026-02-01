@@ -50,7 +50,7 @@ ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 # Dominios permitidos para CORS (configurar según tu dominio)
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:5500","https://devocionales-taupe.vercel.app","https://www.sembradoresdefe.com","https://sembradoresdefe.com").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:5500,https://devocionales-taupe.vercel.app,https://www.sembradoresdefe.com,https://sembradoresdefe.com").split(",")
 
 
 # =============================================================================
